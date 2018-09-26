@@ -23,3 +23,6 @@ class CastHis(Model):
     fees = DecimalField('成交手续费', max_digits=40, decimal_places=20)
     actualfilled = DecimalField('实际成交数量', max_digits=40, decimal_places=20)
     process = BooleanField('处理',default=0)
+
+    class Meta:
+        index_together = ["cast", "process"]

@@ -1,5 +1,6 @@
 from .models import *
 from .log import log
+from .mail import mail
 from django.conf import settings
 from decimal import Decimal
 from django.db.models import Q
@@ -24,7 +25,8 @@ def login(excode,apikey,secretkey):
     return exchange
 
 def comcuravg(cast,exchange):
-    while True:
+    orderbook={}
+    for num in range(300):
         try:
             orderbook = exchange.fetch_order_book(symbol=cast.symbol)
             break
@@ -56,7 +58,7 @@ def buy(cid):
         currentprice, averageprice, sumactualfilled = comcuravg(cast,exchange)
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice))
         if currentprice <= averageprice:
-            orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount))
+            orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             if isinstance(orderdata['id'],str):
                 orderinfo = exchange.fetch_order(symbol=symbol, id=orderdata['id'])
                 casthis=CastHis(cast_id=cid,
@@ -85,18 +87,22 @@ def sell():
             log.warn(getdt() + str(cast.symbol) + '开始卖出')
             exchange = login(cast.excode, cast.apikey, cast.secretkey)
             currentprice, averageprice, sumactualfilled = comcuravg(cast, exchange)
-            wantprice=averageprice* (Decimal(cast.sellpercent)/100+1)
+            wantprice=averageprice*(Decimal(cast.sellpercent)/100+1)
             log.warn('当前价格：' + str(currentprice) + '；持有均价：'+str(averageprice)+'；预期均价：' + str(wantprice))
             if currentprice > wantprice:
+                try:
+                    mail(str(cast.symbol)+'已达卖出条件','卖出通知')
+                except:
+                    pass
                 orderdata=exchange.create_market_sell_order(symbol=cast.symbol, amount=float(sumactualfilled*0.99))
                 if isinstance(orderdata['id'], str):
                     casthiss=CastHis.objects.filter(Q(process=0)&Q(cast_id=cast.id))
-                    for casthis in casthiss:
-                        casthis.process=1
-                        casthis.save()
+                    casthiss.update(process=1)
                     log.warn(getdt() +str(cast.symbol)+ '卖出成功')
             else:
                 log.warn('未满足卖出条件')
 
     except:
         log.warn('卖出异常：\n' + traceback.format_exc())
+
+

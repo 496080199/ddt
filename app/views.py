@@ -8,6 +8,7 @@ from django_apscheduler.jobstores import DjangoJobStore, register_events, regist
 from django_apscheduler.models import DjangoJob
 from pytz import timezone
 
+
 tz=timezone('Asia/Shanghai')
 
 scheduler = BackgroundScheduler(timezone=tz)
@@ -31,13 +32,17 @@ def matchtoken(token):
 
 def stat(request,token,cid):
     if matchtoken(token):
-        cast = Cast.objects.get(pk=cid)
+        try:
+            cast = Cast.objects.get(pk=cid)
+        except:
+            message = '任务不存在'
+            return HttpResponse(message)
         castinfo=',交易名称为'+str(cast.name)+',交易对为'+str(cast.symbol)+',交易额为'+str(cast.buyamount)+',增长百分比为'+str(cast.sellpercent)+'%'
         jobs = DjangoJob.objects.filter(name=str(cid))
         if jobs.exists():
-            message=str(cid)+'已运行'+castinfo
+            message='任务ID:'+str(cid)+'已运行'+castinfo+',下次运行时间:'+str(jobs[0].next_run_time)
         else:
-            message=str(cid)+'未运行'+castinfo
+            message='任务ID:'+str(cid)+'未运行'+castinfo
     else:
         message = '非法请求'
     return HttpResponse(message)
@@ -55,7 +60,7 @@ def load(request,token,cid,hour):
             message='任务已重载'
         else:
             message='任务已加载'
-        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*', minute='*/'+str(hour), second='30',kwargs={'cid': cast.id})
+        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*/'+str(hour), minute='0', second='30',kwargs={'cid': cast.id})
         register_events(scheduler)
 
     else:
