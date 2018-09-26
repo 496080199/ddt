@@ -1,2 +1,3 @@
 .idea/*
 ddt/settings.py
+*.log*
