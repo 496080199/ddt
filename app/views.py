@@ -1,12 +1,17 @@
 from .trade import *
 from django.shortcuts import render
 from django.http import HttpResponse
-
+import requests
+from threading import Thread
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
 from django_apscheduler.models import DjangoJob
 from pytz import timezone
+
+def testself():
+    time.sleep(1)
+    requests.get('http://127.0.0.1:8000/app/')
 
 
 tz=timezone('Asia/Shanghai')
@@ -91,3 +96,6 @@ def pause(request,token,cid):
 
 def index(request):
     return HttpResponse('404')
+
+t=Thread(target=testself,args=())
+t.start()
