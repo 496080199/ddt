@@ -15,6 +15,7 @@ scheduler = BackgroundScheduler(timezone=tz)
 scheduler.add_jobstore(DjangoJobStore(), "default")
 
 scheduler.start()
+print("Scheduler started!")
 
 job = scheduler.get_job(job_id='sell')
 if job:
