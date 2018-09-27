@@ -27,6 +27,7 @@ if job:
     job.remove()
 scheduler.add_job(compensate, "cron", id='compensate', day='*', hour='*', minute='*/5', second='0',
                       kwargs={})
+register_events(scheduler)
 
 def matchtoken(token):
     validate=False
