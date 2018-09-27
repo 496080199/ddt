@@ -89,13 +89,15 @@ def compensate():
                 cast=Cast.objects.get(pk=casthis.cast_id)
                 exchange = login(cast.excode, cast.apikey, cast.secretkey)
                 orderinfo = exchange.fetch_order(symbol=cast.symbol, id=casthis.orderid)
-                casthis.average= Decimal(orderinfo['average'])
-                casthis.cost = Decimal(orderinfo['cost'])
-                casthis.filled = Decimal(orderinfo['info']['field-amount'])
-                casthis.fees = Decimal(orderinfo['info']['field-fees'])
-                casthis.actualfilled = (Decimal(orderinfo['info']['field-amount']) - Decimal(
+                if orderinfo['status'] == 'closed':
+                    casthis.orderstatus = orderinfo['status']
+                    casthis.average= Decimal(orderinfo['average'])
+                    casthis.cost = Decimal(orderinfo['cost'])
+                    casthis.filled = Decimal(orderinfo['info']['field-amount'])
+                    casthis.fees = Decimal(orderinfo['info']['field-fees'])
+                    casthis.actualfilled = (Decimal(orderinfo['info']['field-amount']) - Decimal(
                     orderinfo['info']['field-fees']))
-                casthis.save()
+                    casthis.save()
     except:
         pass
 def sell():
