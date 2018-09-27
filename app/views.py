@@ -19,7 +19,13 @@ scheduler.start()
 job = scheduler.get_job(job_id='sell')
 if job:
     job.remove()
-scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='0',
+scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='15',
+                      kwargs={})
+
+job = scheduler.get_job(job_id='compensate')
+if job:
+    job.remove()
+scheduler.add_job(compensate, "cron", id='compensate', day='*', hour='*', minute='*/5', second='0',
                       kwargs={})
 
 def matchtoken(token):

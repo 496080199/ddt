@@ -80,6 +80,24 @@ def buy(cid):
     except:
         log.warn('买入异常：\n'+traceback.format_exc())
 
+
+def compensate():
+    try:
+        casthiss=CastHis.objects.filter(~Q(orderstatus='closed'))
+        if casthiss.exists():
+            for casthis in casthiss:
+                cast=Cast.objects.get(pk=casthis.cast_id)
+                exchange = login(cast.excode, cast.apikey, cast.secretkey)
+                orderinfo = exchange.fetch_order(symbol=cast.symbol, id=casthis.orderid)
+                casthis.average= Decimal(orderinfo['average'])
+                casthis.cost = Decimal(orderinfo['cost'])
+                casthis.filled = Decimal(orderinfo['info']['field-amount'])
+                casthis.fees = Decimal(orderinfo['info']['field-fees'])
+                casthis.actualfilled = (Decimal(orderinfo['info']['field-amount']) - Decimal(
+                    orderinfo['info']['field-fees']))
+                casthis.save()
+    except:
+        pass
 def sell():
     try:
         casts=Cast.objects.all()

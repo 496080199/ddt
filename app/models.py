@@ -13,7 +13,7 @@ class Cast(Model):
 class CastHis(Model):
     cast = ForeignKey('Cast', on_delete=CASCADE,null=True)
     orderid = CharField('订单ID', max_length=100)
-    orderstatus = CharField('订单状态', max_length=10)
+    orderstatus = CharField('订单状态', max_length=10,db_index=True)
     datetime = DateTimeField('时间',auto_now_add=True)
     ordertype = CharField('类型', max_length=20)
     orderside = CharField('方向', max_length=20)
