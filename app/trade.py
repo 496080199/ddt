@@ -84,7 +84,6 @@ def buy(cid):
 def compensate():
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
-        print(casthiss.query)
         if casthiss.exists():
             for casthis in casthiss:
                 cast=Cast.objects.get(pk=casthis.cast_id)
