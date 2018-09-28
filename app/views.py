@@ -10,7 +10,7 @@ from django_apscheduler.models import DjangoJob
 from pytz import timezone
 
 def testself():
-    time.sleep(1)
+    time.sleep(15)
     requests.get('http://127.0.0.1:8000/app/')
 
 
