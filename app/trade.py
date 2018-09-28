@@ -57,7 +57,7 @@ def buy(cid):
         exchange = login(cast.excode, cast.apikey, cast.secretkey)
         currentprice, averageprice, sumactualfilled = comcuravg(cast,exchange)
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice))
-        if currentprice <= averageprice:
+        if currentprice <= averageprice or symbol in settings.SPECSYMBOL:
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             if isinstance(orderdata['id'],str):
                 orderinfo = exchange.fetch_order(symbol=symbol, id=orderdata['id'])

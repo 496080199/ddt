@@ -20,7 +20,7 @@ print("Scheduler started!")
 job = scheduler.get_job(job_id='sell')
 if job:
     job.remove()
-scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='15',
+scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='59',
                       kwargs={})
 
 job = scheduler.get_job(job_id='compensate')
@@ -68,7 +68,7 @@ def load(request,token,cid,hour):
             message='任务已重载'
         else:
             message='任务已加载'
-        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*/'+str(hour), minute='0', second='30',kwargs={'cid': cast.id})
+        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*/'+str(hour), minute='5', second='30',kwargs={'cid': cast.id})
         register_events(scheduler)
 
     else:
