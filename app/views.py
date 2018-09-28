@@ -98,4 +98,5 @@ def index(request):
     return HttpResponse('404')
 
 t=Thread(target=testself,args=())
+t.setDaemon()
 t.start()
