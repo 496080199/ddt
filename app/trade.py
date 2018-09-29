@@ -60,7 +60,7 @@ def comcuravg(cast,exchange):
 
 def comhisavgprice(cast,exchange):
     sum=Decimal(0.0)
-    data = exchange.fetch_ohlcv(cast.symbol, '1d')
+    data = exchange.fetch_ohlcv(cast.symbol, '1d', since=300)
     for day in data:
         sum+=Decimal(day[4])
     hisavgprice=sum/len(data)
@@ -76,7 +76,7 @@ def buy(cid):
         exchange = login(cast.excode, cast.apikey, cast.secretkey)
         currentprice, averageprice, sumactualfilled = comcuravg(cast,exchange)
         hisavgprice = comhisavgprice(cast, exchange)
-        log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice))+'；历史均价：'+str(hisavgprice)
+        log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice)+'；历史均价：'+str(hisavgprice))
         if currentprice <= hisavgprice:
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             time.sleep(round(random.random()*10,1))
