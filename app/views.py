@@ -46,9 +46,9 @@ def stat(request,token,cid):
             message = '任务不存在'
             return HttpResponse(message)
         castinfo=',交易名称为'+str(cast.name)+',交易对为'+str(cast.symbol)+',交易额为'+str(cast.buyamount)+',增长百分比为'+str(cast.sellpercent)+'%'
-        jobs = DjangoJob.objects.filter(name=str(cid))
-        if jobs.exists():
-            message='任务ID:'+str(cid)+'已运行'+castinfo+',下次运行时间:'+str(jobs[0].next_run_time)
+        job = scheduler.get_job(job_id=str(cast.id))
+        if job:
+            message='任务ID:'+str(cid)+'已运行'+castinfo+',下次运行时间:'+str(job.next_run_time)
         else:
             message='任务ID:'+str(cid)+'未运行'+castinfo
     else:
