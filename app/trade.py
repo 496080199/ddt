@@ -8,6 +8,10 @@ from django.db import connections
 import ccxt,datetime,traceback,time,random
 
 from pytz import timezone
+from cacheout import Cache
+
+cache = Cache()
+cache.configure(maxsize=1000,ttl=8*60*60)
 
 tz=timezone('Asia/Shanghai')
 
@@ -58,6 +62,7 @@ def comcuravg(cast,exchange):
         averageprice = sumcost / sumactualfilled
     return currentprice,averageprice,sumactualfilled
 
+@cache.memoize()
 def comhisavgprice(cast,exchange):
     sum=Decimal(0.0)
     data = exchange.fetch_ohlcv(cast.symbol, '1d', since=300)
