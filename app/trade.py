@@ -12,9 +12,12 @@ from pytz import timezone
 tz=timezone('Asia/Shanghai')
 
 
-def close_old_connections():
-    for conn in connections.all():
-        conn.close_if_unusable_or_obsolete()
+def close_old_connections(func):
+    def warpper():
+        for conn in connections.all():
+            conn.close_if_unusable_or_obsolete()
+        return func()
+    return warpper
 
 
 def getdt():
@@ -55,6 +58,7 @@ def comcuravg(cast,exchange):
         averageprice = sumcost / sumactualfilled
     return currentprice,averageprice,sumactualfilled
 
+@close_old_connections
 def buy(cid):
     try:
         cast = Cast.objects.get(pk=cid)
@@ -87,9 +91,8 @@ def buy(cid):
     except:
         log.warn('买入异常：\n'+traceback.format_exc())
 
-
+@close_old_connections
 def compensate():
-    close_old_connections()
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
         if casthiss.exists():
@@ -108,6 +111,7 @@ def compensate():
                     casthis.save()
     except:
         pass
+@close_old_connections
 def sell():
     try:
         casts=Cast.objects.all()
