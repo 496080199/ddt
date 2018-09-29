@@ -76,9 +76,9 @@ def load(request,token,cid,hour):
     return HttpResponse(message)
 def pause(request,token,cid):
     if matchtoken(token):
-        jobs = DjangoJob.objects.filter(name=str(cid))
-        if jobs.exists():
-            jobs.delete()
+        job=scheduler.get_job(job_id=str(cid))
+        if job:
+            job.remove()
             message='任务已暂停'
         else:
             message='无此任务'
