@@ -5,7 +5,7 @@ from django.conf import settings
 from decimal import Decimal
 from django.db.models import Q
 from django.db import connections
-import ccxt,datetime,traceback,time
+import ccxt,datetime,traceback,time,random
 
 from pytz import timezone
 
@@ -13,9 +13,11 @@ tz=timezone('Asia/Shanghai')
 
 
 def close_old_connections():
-    for conn in connections.all():
-        conn.close_if_unusable_or_obsolete()
-
+    try:
+        for conn in connections.all():
+            conn.close_if_unusable_or_obsolete()
+    except:
+        pass
 
 
 def getdt():
@@ -56,6 +58,13 @@ def comcuravg(cast,exchange):
         averageprice = sumcost / sumactualfilled
     return currentprice,averageprice,sumactualfilled
 
+def comhisavgprice(cast,exchange):
+    sum=Decimal(0.0)
+    data = exchange.fetch_ohlcv(cast.symbol, '1d')
+    for day in data:
+        sum+=Decimal(day[4])
+    hisavgprice=sum/len(data)
+    return hisavgprice
 
 def buy(cid):
     close_old_connections()
@@ -66,9 +75,11 @@ def buy(cid):
         amount = cast.buyamount
         exchange = login(cast.excode, cast.apikey, cast.secretkey)
         currentprice, averageprice, sumactualfilled = comcuravg(cast,exchange)
-        log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice))
-        if currentprice <= averageprice or symbol in settings.SPECSYMBOL:
+        hisavgprice = comhisavgprice(cast, exchange)
+        log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice))+'；历史均价：'+str(hisavgprice)
+        if currentprice <= hisavgprice:
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
+            time.sleep(round(random.random()*10,1))
             if isinstance(orderdata['id'],str):
                 orderinfo = exchange.fetch_order(symbol=symbol, id=orderdata['id'])
                 casthis=CastHis(cast_id=cid,
