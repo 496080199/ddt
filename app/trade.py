@@ -4,11 +4,18 @@ from .mail import mail
 from django.conf import settings
 from decimal import Decimal
 from django.db.models import Q
+from django.db import connections
 import ccxt,datetime,traceback,time
 
 from pytz import timezone
 
 tz=timezone('Asia/Shanghai')
+
+
+def close_old_connections():
+    for conn in connections.all():
+        conn.close_if_unusable_or_obsolete()
+
 
 def getdt():
     dt=str(datetime.datetime.now(tz).isoformat())+'----'
@@ -82,6 +89,7 @@ def buy(cid):
 
 
 def compensate():
+    close_old_connections()
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
         if casthiss.exists():
