@@ -52,7 +52,7 @@ def comcuravg(cast,exchange):
     currentprice = Decimal((ask + bid) / 2)
     sumactualfilled = Decimal(0.0)
     sumcost = Decimal(0.0)
-    casthiss = CastHis.objects.filter(Q(process=0)&Q(cast_id=cast.id))
+    casthiss = CastHis.objects.filter(Q(process=0)&Q(cast_id=cast.id)).values('actualfilled','cost')
     if casthiss.exists():
         sumactualfilled = Decimal(casthiss.aggregate(Sum('actualfilled'))['actualfilled__sum'])
         sumcost = Decimal(casthiss.aggregate(Sum('cost'))['cost__sum'])
@@ -84,6 +84,7 @@ def buy(cid):
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice)+'；历史均价：'+str(hisavgprice))
         if currentprice <= hisavgprice:
             if (averageprice-currentprice)/averageprice > 0.3:
+                log.warn('跌幅过大，双倍买入')
                 amount = amount * 2
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             time.sleep(round(random.random()*10,1))
@@ -150,6 +151,9 @@ def sell():
                     casthiss=CastHis.objects.filter(Q(process=0)&Q(cast_id=cast.id))
                     casthiss.update(process=1)
                     log.warn(getdt() +str(cast.symbol)+ '卖出成功')
+                    cast.buyamount+=0.1
+                    cast.save()
+                    log.warn('定投金额增加0.1')
             else:
                 log.warn('未满足卖出条件')
 
