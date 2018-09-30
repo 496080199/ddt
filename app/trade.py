@@ -28,6 +28,7 @@ def getdt():
     dt=str(datetime.datetime.now(tz).isoformat())+'----'
     return dt
 
+@cache.memoize()
 def login(excode,apikey,secretkey):
     exchange = eval("ccxt." + excode + "()")
     exchange.apiKey = apikey
