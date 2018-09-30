@@ -83,6 +83,8 @@ def buy(cid):
         hisavgprice = comhisavgprice(cast, exchange)
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice)+'；历史均价：'+str(hisavgprice))
         if currentprice <= hisavgprice:
+            if (averageprice-currentprice)/averageprice > 0.3:
+                amount = amount * 2
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             time.sleep(round(random.random()*10,1))
             if isinstance(orderdata['id'],str):

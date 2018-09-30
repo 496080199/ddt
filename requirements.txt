@@ -3,3 +3,4 @@ mysqlclient
 ccxt
 django_apscheduler
 gunicorn
+cacheout

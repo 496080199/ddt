@@ -4,7 +4,7 @@ from django.http import HttpResponse
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from django_apscheduler.jobstores import DjangoJobStore, register_events, register_job
-from django_apscheduler.models import DjangoJob
+from django.db import connection
 from pytz import timezone
 
 
@@ -90,4 +90,6 @@ def pause(request,token,cid):
 # Create your views here.
 
 def index(request):
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT 1")
     return HttpResponse('404')
