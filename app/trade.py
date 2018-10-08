@@ -73,7 +73,7 @@ def comhisavgprice(cast,exchange):
     return hisavgprice
 
 def buy(cid):
-    #close_old_connections()
+    close_old_connections()
     try:
         cast = Cast.objects.get(pk=cid)
         symbol = cast.symbol
@@ -112,7 +112,7 @@ def buy(cid):
 
 
 def compensate():
-    #close_old_connections()
+    close_old_connections()
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
         if casthiss.exists():
@@ -133,7 +133,7 @@ def compensate():
         pass
 
 def sell():
-    #close_old_connections()
+    close_old_connections()
     try:
         casts=Cast.objects.all()
         for cast in casts:
