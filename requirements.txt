@@ -4,3 +4,4 @@ ccxt
 django_apscheduler
 gunicorn
 cacheout
+django-dbconn-retry
