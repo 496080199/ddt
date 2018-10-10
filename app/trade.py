@@ -5,7 +5,7 @@ from django.conf import settings
 from decimal import Decimal
 from django.db.models import Q
 from django.db import connections
-import ccxt,datetime,traceback,time,random
+import django,ccxt,datetime,traceback,time,random
 
 from pytz import timezone
 from cacheout import Cache
@@ -73,7 +73,7 @@ def comhisavgprice(cast,exchange):
     return hisavgprice
 
 def buy(cid):
-    close_old_connections()
+    django.setup()
     try:
         cast = Cast.objects.get(pk=cid)
         symbol = cast.symbol
@@ -112,7 +112,7 @@ def buy(cid):
 
 
 def compensate():
-    close_old_connections()
+    django.setup()
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
         if casthiss.exists():
@@ -133,7 +133,7 @@ def compensate():
         pass
 
 def sell():
-    close_old_connections()
+    django.setup()
     try:
         casts=Cast.objects.all()
         for cast in casts:
