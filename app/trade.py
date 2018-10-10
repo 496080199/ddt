@@ -5,6 +5,7 @@ from django.conf import settings
 from decimal import Decimal
 from django.db.models import Q
 from django.db import connections
+from django.db import connection
 import django,ccxt,datetime,traceback,time,random
 
 from pytz import timezone
@@ -73,6 +74,7 @@ def comhisavgprice(cast,exchange):
     return hisavgprice
 
 def buy(cid):
+    connection.close()
     django.setup()
     try:
         cast = Cast.objects.get(pk=cid)
@@ -112,6 +114,7 @@ def buy(cid):
 
 
 def compensate():
+    connection.close()
     django.setup()
     try:
         casthiss=CastHis.objects.exclude(orderstatus='closed')
@@ -133,6 +136,7 @@ def compensate():
         pass
 
 def sell():
+    connection.close()
     django.setup()
     try:
         casts=Cast.objects.all()

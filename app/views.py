@@ -17,16 +17,10 @@ scheduler.add_jobstore(DjangoJobStore(), "default")
 scheduler.start()
 print("Scheduler started!")
 
-job = scheduler.get_job(job_id='sell')
-if job:
-    job.remove()
-scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='59',
-                      kwargs={})
 
-job = scheduler.get_job(job_id='compensate')
-if job:
-    job.remove()
-scheduler.add_job(compensate, "cron", id='compensate', day='*', hour='*', minute='*/5', second='0',
+scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='59',replace_existing=True,
+                      kwargs={})
+scheduler.add_job(compensate, "cron", id='compensate', day='*', hour='*', minute='*/5', second='0',replace_existing=True,
                       kwargs={})
 register_events(scheduler)
 
