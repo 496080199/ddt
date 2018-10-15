@@ -40,6 +40,8 @@ def login(excode,apikey,secretkey):
         exchange.proxies = {'http':'http://'+settings.PROXY_ADDR,'https':'http://'+settings.PROXY_ADDR}
     return exchange
 
+
+
 def comcuravg(cast,exchange):
     orderbook={}
     for num in range(300):
@@ -134,6 +136,42 @@ def compensate():
                     casthis.save()
     except:
         pass
+
+
+def fastprocess(cast,exchange):
+    orderbook = {}
+    for num in range(300):
+        try:
+            orderbook = exchange.fetch_order_book(symbol=cast.symbol)
+            break
+        except:
+            time.sleep(0.3)
+            continue
+    bid = orderbook['bids'][0][0] if len(orderbook['bids']) > 0 else None
+    ask = orderbook['asks'][0][0] if len(orderbook['asks']) > 0 else None
+    currentprice = Decimal((ask + bid) / 2)
+    casthiss = CastHis.objects.filter(Q(process=0) & Q(cast_id=cast.id)& Q(average__lte=currentprice/Decimal(1.05)))
+    if casthiss.exists():
+        for casthis in casthiss:
+            try:
+                orderdata = exchange.create_market_sell_order(symbol=cast.symbol, amount=float(casthis.actualfilled) * 0.99)
+                if isinstance(orderdata['id'], str):
+                    casthis.process=1
+                    casthis.save()
+                    log.warn(getdt() + str(cast.symbol) + orderdata['id']+'已快速卖出')
+                    time.sleep(0.2)
+            except:
+                continue
+def fastsell():
+    connection.close()
+    django.setup()
+    try:
+        casts = Cast.objects.all()
+        for cast in casts:
+            exchange = login(cast.excode, cast.apikey, cast.secretkey)
+            fastprocess(cast,exchange)
+    except:
+        log.warn('快速卖出异常：\n' + traceback.format_exc())
 
 def sell():
     connection.close()
