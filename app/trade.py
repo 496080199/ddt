@@ -150,7 +150,7 @@ def fastprocess(cast,exchange):
     bid = orderbook['bids'][0][0] if len(orderbook['bids']) > 0 else None
     ask = orderbook['asks'][0][0] if len(orderbook['asks']) > 0 else None
     currentprice = Decimal((ask + bid) / 2)
-    casthiss = CastHis.objects.filter(Q(process=0) & Q(cast_id=cast.id)& Q(average__lte=currentprice/Decimal(1.05)))
+    casthiss = CastHis.objects.filter(Q(process=0) & Q(cast_id=cast.id)& Q(average__lte=currentprice/Decimal(1.1)))
     if casthiss.exists():
         for casthis in casthiss:
             try:
@@ -161,6 +161,7 @@ def fastprocess(cast,exchange):
                     log.warn(getdt() + str(cast.symbol) + orderdata['id']+'已快速卖出')
                     time.sleep(0.2)
             except:
+                log.warn(str(traceback.format_exc()))
                 continue
 def fastsell():
     connection.close()
