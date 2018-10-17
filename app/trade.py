@@ -88,9 +88,13 @@ def buy(cid):
         hisavgprice = comhisavgprice(cast, exchange)
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice)+'；历史均价：'+str(hisavgprice))
         if currentprice <= hisavgprice:
-            if (hisavgprice-currentprice)/hisavgprice > 0.3:
-                log.warn('跌幅过大，双倍买入')
+            hiscurdiff=(hisavgprice-currentprice)/hisavgprice
+            if hiscurdiff > 0.2 and hiscurdiff <= 0.4:
+                log.warn('跌幅20%，双倍买入')
                 amount = amount * 2
+            elif hiscurdiff > 0.4:
+                log.warn('跌幅40%，三倍买入')
+                amount = amount * 3
             orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
             time.sleep(round(random.random()*10,1))
             if isinstance(orderdata['id'],str):
@@ -154,7 +158,7 @@ def fastprocess(cast,exchange):
     if casthiss.exists():
         for casthis in casthiss:
             try:
-                orderdata = exchange.create_market_sell_order(symbol=cast.symbol, amount=float(casthis.actualfilled) * 0.99)
+                orderdata = exchange.create_market_sell_order(symbol=cast.symbol, amount=(float(casthis.actualfilled)*0.99))
                 if isinstance(orderdata['id'], str):
                     casthis.process=1
                     casthis.save()
@@ -190,14 +194,11 @@ def sell():
                     mail(str(cast.symbol)+'已达卖出条件','卖出通知')
                 except:
                     pass
-                orderdata=exchange.create_market_sell_order(symbol=cast.symbol, amount=float(sumactualfilled*0.99))
+                orderdata=exchange.create_market_sell_order(symbol=cast.symbol, amount=(float(sumactualfilled)*0.99))
                 if isinstance(orderdata['id'], str):
                     casthiss=CastHis.objects.filter(Q(process=0)&Q(cast_id=cast.id))
                     casthiss.update(process=1)
                     log.warn(getdt() +str(cast.symbol)+ '卖出成功')
-                    cast.buyamount+=0.1
-                    cast.save()
-                    log.warn('定投金额增加0.1')
             else:
                 log.warn('未满足卖出条件')
 
