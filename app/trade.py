@@ -89,11 +89,11 @@ def buy(cid):
         log.warn('当前价格：'+str(currentprice)+'；持有均价：'+str(averageprice)+'；历史均价：'+str(hisavgprice))
         if currentprice <= hisavgprice:
             hiscurdiff=(hisavgprice-currentprice)/hisavgprice
-            if hiscurdiff > 0.2 and hiscurdiff <= 0.4:
-                log.warn('跌幅20%，双倍买入')
+            if hiscurdiff > 0.3 and hiscurdiff <= 0.5:
+                log.warn('跌幅30%，双倍买入')
                 amount = amount * 2
-            elif hiscurdiff > 0.4:
-                log.warn('跌幅40%，三倍买入')
+            elif hiscurdiff > 0.5:
+                log.warn('跌幅50%，三倍买入')
                 amount = amount * 3
         orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
         time.sleep(round(random.random()*10,1))

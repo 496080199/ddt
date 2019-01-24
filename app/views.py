@@ -64,7 +64,9 @@ def load(request,token,cid,hour):
             message='任务已重载'
         else:
             message='任务已加载'
-        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*/'+str(hour), minute='5', second='30',kwargs={'cid': cast.id})
+        #scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour='*/'+str(hour), minute='5', second='30',kwargs={'cid': cast.id})
+        scheduler.add_job(buy, "cron", id=str(cast.id), day='*', hour=str(hour), minute='5', second='30',
+                          kwargs={'cid': cast.id})
         register_events(scheduler)
 
     else:
