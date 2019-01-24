@@ -20,8 +20,8 @@ print("Scheduler started!")
 
 #scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/15', second='59',replace_existing=True,
 #  kwargs={})
-scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/10', second='59',replace_existing=True,
-                      kwargs={})
+#scheduler.add_job(sell, "cron", id='sell', day='*', hour='*', minute='*/10', second='59',replace_existing=True,
+ #                     kwargs={})
 scheduler.add_job(compensate, "cron", id='compensate', day='*', hour='*', minute='*/5', second='0',replace_existing=True,
                       kwargs={})
 register_events(scheduler)
