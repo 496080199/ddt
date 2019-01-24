@@ -95,11 +95,11 @@ def buy(cid):
             elif hiscurdiff > 0.4:
                 log.warn('跌幅40%，三倍买入')
                 amount = amount * 3
-            orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
-            time.sleep(round(random.random()*10,1))
-            if isinstance(orderdata['id'],str):
-                orderinfo = exchange.fetch_order(symbol=symbol, id=orderdata['id'])
-                casthis=CastHis(cast_id=cid,
+        orderdata = exchange.create_market_buy_order(symbol=symbol, amount=float(amount), params={'cost': float(amount)})
+        time.sleep(round(random.random()*10,1))
+        if isinstance(orderdata['id'],str):
+            orderinfo = exchange.fetch_order(symbol=symbol, id=orderdata['id'])
+            casthis=CastHis(cast_id=cid,
                                 orderid=orderinfo['id'],
                                 orderstatus=orderinfo['status'],
                                 ordertype=orderinfo['type'],
@@ -110,10 +110,9 @@ def buy(cid):
                                 fees=Decimal(orderinfo['info']['field-fees']),
                                 actualfilled=(Decimal(orderinfo['info']['field-amount']) - Decimal(
                                     orderinfo['info']['field-fees'])))
-                casthis.save()
-                log.warn(getdt()+ str(symbol )+'买入成功')
-        else:
-            log.warn('未满足买入条件')
+            casthis.save()
+            log.warn(getdt()+ str(symbol )+'买入成功')
+        
 
     except:
         log.warn('买入异常：\n'+traceback.format_exc())
