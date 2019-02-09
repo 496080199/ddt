@@ -137,6 +137,8 @@ def compensate():
                     casthis.actualfilled = (Decimal(orderinfo['info']['field-amount']) - Decimal(
                     orderinfo['info']['field-fees']))
                     casthis.save()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
     except:
         pass
 
